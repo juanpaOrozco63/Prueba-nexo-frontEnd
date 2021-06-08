@@ -5,5 +5,5 @@ export class Mercancia{
     nombre:String;
     total:number;
     productoId:number;
-    usuarioId:number    
+    usuarioId:number ;   
 }

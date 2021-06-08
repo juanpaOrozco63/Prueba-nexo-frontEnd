@@ -25,6 +25,7 @@
                         <th scope="col">Fecha de ingreso</th>
                         <th scope="col">Cantidad</th>
                         <th scope="col">Total</th>
+                        <th scope="col">Editar</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -37,7 +38,7 @@
                         <td>{{ merca.total }}</td>
 
                         <td>
-                            <button class="btn btn-info btn-editar" (click)="openCentrado(updateCredit, credit)">
+                            <button class="btn btn-primary btn-editar" (click)="openCentrado(actualizar, merca)">
                                 <i class="fas fa-user-edit"></i>
                             </button>
                         </td>
@@ -48,7 +49,7 @@
 
             <div class="form-group d-flex flex-row-reverse ">
                 <div class="p-2">
-                    <button class="btn btn-info" (click)="modal.open(crearMercancia); limpiar()">Nueva mercancia</button>
+                    <button class="btn btn-primary" (click)="modal.open(contenido) ">Nueva mercancia</button>
                 </div>
 
             </div>
@@ -56,7 +57,7 @@
         </div>
     </div>
 </div>
-<ng-template #crearMercancia let-modal>
+<ng-template #contenido let-modal>
     <div class="modal-header">
         <h4 class="modal-title">Nueva mercancia</h4>
         <button class="close" aria-label="close" type="button" (click)="modal.dismiss()">
@@ -64,9 +65,9 @@
     </button>
     </div>
     <div class="modal-body">
-        <form autocomplete="off" [formGroup]="formCreateCredit" (ngSubmit)="modalCrearMercancia(inputName.value,inputProducto.value,inputUsuario.value,inputFechaIngreso.value)">
+        <form autocomplete="off" [formGroup]="formCrearMercancia" (ngSubmit)="modalCrearMercancia(inputName.value,inputProducto.value,inputUsuario.value,inputFechaIngreso.value,inputCantidad.value)">
             <div class="form-row">
-                <div class="form-group col-6">
+                <div class="form-group col-12">
                     <label for="inputName">Nombre</label>
                     <input type="text" class="form-control" #inputName id="inputName" name="inputName" [class.is-invalid]="inputNameInvalid" formControlName="inputName" />
                     <div class="text-left">
@@ -77,7 +78,7 @@
                     <label for="inputProducto">Producto</label>
                     <select class="form-control" #inputProducto id="inputProducto" name="inputProducto" [class.is-invalid]="inputProductoInvalid" formControlName="inputProducto">
                         <option [ngValue]="null" [disabled]="true">Seleccione un producto</option>                             
-                        <option *ngFor="let pro of productos" [value]="pro.productoId">{{pro.nombre}}</option>
+                        <option *ngFor="let pro of arrProducto" [value]="pro.productoId" >{{pro.nombre}}</option>
                     </select>
                     <div class="text-left">
                         <small *ngIf="inputProductoInvalid" class="text-danger ">Seleccione un producto</small>
@@ -87,7 +88,7 @@
                     <label for="inputUsuario">Usuario</label>
                     <select class="form-control" #inputUsuario id="inputUsuario" name="inputUsuario" [class.is-invalid]="inputUsuarioInvalid" formControlName="inputUsuario">
                         <option [ngValue]="null" [disabled]="true">Seleccione un usuario</option>                             
-                        <option *ngFor="let user of usuarios" [value]="user.usuarioId">{{user.nombre}}</option>
+                        <option *ngFor="let user of arrUsuario" [value]="user.usuarioId">{{user.nombre}}</option>
                     </select>
                     <div class="text-left">
                         <small *ngIf="inputUsuarioInvalid" class="text-danger ">Seleccione un usuario</small>
@@ -100,7 +101,7 @@
                         <small *ngIf="inputFechaIngresoInvalid" class="text-danger ">Ingrese una fecha de ingreso</small>
                     </div>
                 </div>
-                <div class="form-group col-6">
+                <div class="form-group col-12">
                     <label for="inputCantidad">Cantidad</label>
                     <input type="number" class="form-control" #inputCantidad id="inputCantidad" name="inputCantidad" [class.is-invalid]="inputCantidadInvalid" formControlName="inputCantidad" />
                     <div class="text-left">
@@ -114,36 +115,46 @@
         </form>
     </div>
     <div class="modal-footer">
-
         <button type="button" class="btn btn-danger btn-block" (click)="modal.close()">
-      Cancelar
-    </button>
+          Cancelar
+        </button>
+
     </div>
 </ng-template>
-<ng-template #actualizarMercancia let-modal>
+<ng-template #actualizar let-modal>
     <div class="modal-header">
         <h4 class="modal-title">Editar mercancia</h4>
         <button class="close" aria-label="close" type="button" (click)="modal.dismiss()">
-      <span aria-hidden="true">&times;</span>
-    </button>
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
     <div class="modal-body">
         <form autocomplete="off">
             <div class="form-row">
-                <div class="form-group col-6">
+                <div class="form-group col-12">
                     <label for="inputNameUpdate">Nombre</label>
                     <input type="text" class="form-control" id="inputNameUpdate" name="inputNameUpdate" [(ngModel)]="mercanciaModal.nombre" />
                     <div class="text-left">
                         <small *ngIf="inputNameInvalid" class="text-danger ">Ingrese un nombre</small>
                     </div>
                 </div>
-                <div class="form-group col-6">
-                    <label for="inputLastNameUpdate">Producto</label>
-                    <input type="text" class="form-control" id="inputLastNameUpdate" name="inputLastNameUpdate" [(ngModel)]="mercanciaModal.productoId" />
+                <div class="form-group col-12">
+                    <label for="inputUsuario">Usuario</label>
+                    <select class="form-control" name="inputUsuarioUpdate" id="inputUsuarioUpdate" #inputUsuarioUpdate [(ngModel)]="mercanciaModal.usuarioId">
+                        <option [ngValue]="null" [disabled]="true">Seleccione un usuario</option>
+                        <option *ngFor="let user of arrUsuario" [value]="user.usuarioId">{{user.nombre}}</option>
+                    </select>
                 </div>
                 <div class="form-group col-12">
-                    <label for="inputEmailUpdate">Cantidad</label>
-                    <input type="email" class="form-control" disabled id="inputEmailUpdate" name="inputEmailUpdate" [(ngModel)]="mercanciaModal.cantidad" />
+                    <label for="inputProductoUpdate">Producto</label>
+                    <select class="form-control" #inputProductoUpdate id="inputProductoUpdate" name="inputProductoUpdate" [(ngModel)]="mercanciaModal.productoId">
+                        <option [ngValue]="null" [disabled]="true">Seleccione un producto</option>                             
+                        <option *ngFor="let pro of arrProducto" [value]="pro.productoId">{{pro.nombre}}</option>
+                    </select>
+                </div>
+                <div class="form-group col-12">
+                    <label for="inputCantidadUpdate">Cantidad</label>
+                    <input type="number" class="form-control" id="inputCantidadUpdate" name="inputCantidadUpdate" [(ngModel)]="mercanciaModal.cantidad" />
                 </div>
             </div>
             <button type="button" class="btn btn-block btn-primary " (click)="editarModalMercancia()">

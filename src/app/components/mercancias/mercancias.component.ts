@@ -3,7 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Mercancia } from '../../domains/Mercancia';
 import { MercanciaService } from '../../services/mercancia.service';
-
+import { ProductoService } from '../../services/producto.service';
+import { UsuariosService } from '../../services/usuarios.service';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-mercancias',
   templateUrl: './mercancias.component.html',
@@ -17,11 +19,15 @@ export class MercanciasComponent implements OnInit {
   buscar:string ='';
   validar:boolean=false;
   mercanciaModal:Mercancia;
-
+  arrProducto:any[] = new Array<any>();
+  arrUsuario:any[]= new Array<any>();
+  precio:number=0;
 
   constructor( public modal: NgbModal,
     private fb: FormBuilder,
-    private mercanciaService:MercanciaService) {
+    private mercanciaService:MercanciaService,
+    private productosService:ProductoService,
+    private usuarioService:UsuariosService) {
       this.createForm();
       this.loadFormData();
       this.createListeners();
@@ -39,13 +45,24 @@ export class MercanciasComponent implements OnInit {
       null     
     );
     this.obtenerMercancias()
+    this.obtenerProductos()
+    this.obtenerUsuarios()
   }
   obtenerMercancias(): void {
     this.mercanciaService.findAll().subscribe((resp)=>{
       this.arrMercancia= resp;
     })
       }
-   
+    obtenerProductos():void{
+      this.productosService.finAllProductos().subscribe((resp)=>{
+        this.arrProducto=resp
+      })
+    }
+   obtenerUsuarios():void{
+     this.usuarioService.findAll().subscribe((resp)=>{
+       this.arrUsuario =resp
+     })
+   }
   // Método para crear formulario
   createForm() {
     this.formCrearMercancia = this.fb.group({
@@ -116,7 +133,16 @@ export class MercanciasComponent implements OnInit {
     })
   }
   editarModalMercancia(){
-
+    this.mercanciaService.update(this.mercanciaModal).subscribe((resp)=>{
+      Swal.fire({
+        icon: 'success',
+        title: 'Editado',
+        text: 'Editado',
+      });
+      this.modal.dismissAll()     
+    })
+    
+      
   }
   //Abri el modal centrado
   openCentrado(contain, mercancia: Mercancia) {
@@ -124,7 +150,40 @@ export class MercanciasComponent implements OnInit {
     //Abrir modal
     this.modal.open(contain, { centered: true });
   }
-  modalCrearMercancia(){
-    
+  modalCrearMercancia(inputName,inputProducto,inputUsuario,inputFechaIngreso,inputCantidad):void{
+    if(this.formCrearMercancia.invalid){    
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Complete todos los datos',
+      });      
+      return Object.values(this.formCrearMercancia.controls).forEach(control =>{
+        control.markAsTouched();
+      })
+    }else{
+      this.mercancia.nombre =inputName;
+      this.mercancia.productoId=inputProducto;
+      this.mercancia.usuarioId=inputUsuario;
+      this.mercancia.fechaIngreso=inputFechaIngreso;
+      this.mercancia.cantidad=inputCantidad;
+      this.mercancia.mercanciaId=0;
+      this.arrProducto.forEach(pro=>{
+        if(pro.productoId==inputProducto){
+          this.precio= pro.precio
+        }       
+      }) 
+      this.mercancia.total=(inputCantidad*this.precio)  
+      this.mercanciaService.save(this.mercancia).subscribe((resp)=>{
+        Swal.fire({
+          icon: 'success',
+          title: 'Completado',
+          text: 'Completado',
+        });
+        this.modal.dismissAll()   
+        this.obtenerMercancias();   
+      })
+     
+    }
   }
+  
 }
