@@ -1,0 +1,160 @@
+<div class="card">
+    <h5>
+        <div class="card-header">
+            Nexo Software
+        </div>
+    </h5>
+    <div class="card-body">
+        <div class="container-fluid">
+            <h1 class="mb-4 text-center">Mercancias</h1>
+            <div class="input-group mb-3 ">
+                <div class="input-group-prepend">
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon1" (click)="buscarMercancia()">Buscar</button>
+                </div>
+                <input type="text" class="form-control col-auto" (keyup.enter)="buscarMercancia()" placeholder="Buscar" aria-label="Example text with button addon" aria-describedby="button-addon1" [(ngModel)]="buscar">
+            </div>
+            <div class="alert alert-danger" role="alert" *ngIf="validar">
+                No existen mercancias disponibles
+            </div>
+            <table class="table table-striped table-bordered text-center ">
+                <thead>
+                    <tr>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">ProductoId</th>
+                        <th scope="col">UsuarioId</th>
+                        <th scope="col">Fecha de ingreso</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let merca of arrMercancia| paginate: { itemsPerPage: 5, currentPage: currentPage} ; let i = index">
+                        <td>{{ merca.nombre }}</td>
+                        <td>{{ merca.productoId }}</td>
+                        <td>{{ merca.usuarioId }}</td>
+                        <td>{{ merca.fechaIngreso }}</td>
+                        <td>{{ merca.cantidad }}</td>
+                        <td>{{ merca.total }}</td>
+
+                        <td>
+                            <button class="btn btn-info btn-editar" (click)="openCentrado(updateCredit, credit)">
+                                <i class="fas fa-user-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <pagination-controls class="text-center " (pageChange)="currentPage=$event"></pagination-controls>
+
+            <div class="form-group d-flex flex-row-reverse ">
+                <div class="p-2">
+                    <button class="btn btn-info" (click)="modal.open(crearMercancia); limpiar()">Nueva mercancia</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<ng-template #crearMercancia let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Nueva mercancia</h4>
+        <button class="close" aria-label="close" type="button" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+        <form autocomplete="off" [formGroup]="formCreateCredit" (ngSubmit)="modalCrearMercancia(inputName.value,inputProducto.value,inputUsuario.value,inputFechaIngreso.value)">
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label for="inputName">Nombre</label>
+                    <input type="text" class="form-control" #inputName id="inputName" name="inputName" [class.is-invalid]="inputNameInvalid" formControlName="inputName" />
+                    <div class="text-left">
+                        <small *ngIf="inputNameInvalid" class="text-danger ">Ingrese un nombre</small>
+                    </div>
+                </div>
+                <div class="form-group col-12">
+                    <label for="inputProducto">Producto</label>
+                    <select class="form-control" #inputProducto id="inputProducto" name="inputProducto" [class.is-invalid]="inputProductoInvalid" formControlName="inputProducto">
+                        <option [ngValue]="null" [disabled]="true">Seleccione un producto</option>                             
+                        <option *ngFor="let pro of productos" [value]="pro.productoId">{{pro.nombre}}</option>
+                    </select>
+                    <div class="text-left">
+                        <small *ngIf="inputProductoInvalid" class="text-danger ">Seleccione un producto</small>
+                    </div>
+                </div>
+                <div class="form-group col-12">
+                    <label for="inputUsuario">Usuario</label>
+                    <select class="form-control" #inputUsuario id="inputUsuario" name="inputUsuario" [class.is-invalid]="inputUsuarioInvalid" formControlName="inputUsuario">
+                        <option [ngValue]="null" [disabled]="true">Seleccione un usuario</option>                             
+                        <option *ngFor="let user of usuarios" [value]="user.usuarioId">{{user.nombre}}</option>
+                    </select>
+                    <div class="text-left">
+                        <small *ngIf="inputUsuarioInvalid" class="text-danger ">Seleccione un usuario</small>
+                    </div>
+                </div>
+                <div class="form-group col-12">
+                    <label for="inputFechaIngreso">Fecha de ingreso</label>
+                    <input type="date" class="form-control" #inputFechaIngreso id="inputFechaIngreso" name="inputFechaIngreso" [class.is-invalid]="inputFechaIngresoInvalid" formControlName="inputFechaIngreso" />
+                    <div class="text-left">
+                        <small *ngIf="inputFechaIngresoInvalid" class="text-danger ">Ingrese una fecha de ingreso</small>
+                    </div>
+                </div>
+                <div class="form-group col-6">
+                    <label for="inputCantidad">Cantidad</label>
+                    <input type="number" class="form-control" #inputCantidad id="inputCantidad" name="inputCantidad" [class.is-invalid]="inputCantidadInvalid" formControlName="inputCantidad" />
+                    <div class="text-left">
+                        <small *ngIf="inputCantidadInvalid" class="text-danger ">Ingrese una cantidad</small>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-block btn-primary ">
+                Agregar
+              </button>
+        </form>
+    </div>
+    <div class="modal-footer">
+
+        <button type="button" class="btn btn-danger btn-block" (click)="modal.close()">
+      Cancelar
+    </button>
+    </div>
+</ng-template>
+<ng-template #actualizarMercancia let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Editar mercancia</h4>
+        <button class="close" aria-label="close" type="button" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    <div class="modal-body">
+        <form autocomplete="off">
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label for="inputNameUpdate">Nombre</label>
+                    <input type="text" class="form-control" id="inputNameUpdate" name="inputNameUpdate" [(ngModel)]="mercanciaModal.nombre" />
+                    <div class="text-left">
+                        <small *ngIf="inputNameInvalid" class="text-danger ">Ingrese un nombre</small>
+                    </div>
+                </div>
+                <div class="form-group col-6">
+                    <label for="inputLastNameUpdate">Producto</label>
+                    <input type="text" class="form-control" id="inputLastNameUpdate" name="inputLastNameUpdate" [(ngModel)]="mercanciaModal.productoId" />
+                </div>
+                <div class="form-group col-12">
+                    <label for="inputEmailUpdate">Cantidad</label>
+                    <input type="email" class="form-control" disabled id="inputEmailUpdate" name="inputEmailUpdate" [(ngModel)]="mercanciaModal.cantidad" />
+                </div>
+            </div>
+            <button type="button" class="btn btn-block btn-primary " (click)="editarModalMercancia()">
+                Editar
+              </button>
+        </form>
+    </div>
+    <div class="modal-footer">
+
+        <button type="button" class="btn btn-danger btn-block" (click)="modal.close()">
+      Cancelar
+    </button>
+    </div>
+</ng-template>
