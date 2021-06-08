@@ -185,5 +185,39 @@ export class MercanciasComponent implements OnInit {
      
     }
   }
+  async eliminarMercancia(mercancia:Mercancia){
+    console.log(this.arrUsuario);
+     Swal.fire({
+      title: 'Eliminar una mercancia',
+      input: 'select',
+      inputOptions: {
+        'Usuarios': {
+          1: 'Juan Pablo Orozco',
+          2: 'Jose Fernando',
+          3: 'Francisco Javier'
+        }
+      },
+      inputPlaceholder: 'Seleccione un usuario',
+      showCancelButton: true,
+      inputValidator: (value) => {
+        return new Promise((resolve) => {
+          if (value) {
+            let idUsuario = parseInt(value)
+            this.mercanciaService.eliminarMercancia(mercancia.mercanciaId,idUsuario).subscribe(resp=>{
+              this.obtenerMercancias()
+              Swal.fire({
+                icon: 'success',
+                title: 'Eliminado',
+                text: 'Eliminado',
+              });
+            })
+            resolve('')
+          } else {
+            resolve('Seleccione un usuario para poder eliminar una membresia')
+          }
+        })
+      }
+    })
+  }
   
 }

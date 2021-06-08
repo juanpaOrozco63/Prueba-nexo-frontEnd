@@ -35,6 +35,15 @@ export class MercanciaService {
       })
     );
   }
+  public eliminarMercancia(idMercancia:number,idUsuario:number):Observable<any>{
+    return this.httClient.delete<any>(this.url+'delete/'+idMercancia+'/'+idUsuario).pipe(
+      catchError(e=>{
+        Swal.fire('Error',e.error.error[0],'error');
+        console.error(e);
+         return throwError(e);
+      })
+    );
+  }
 
   
 }
